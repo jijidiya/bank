@@ -120,7 +120,7 @@ class InterestRewardsAcct(BankAccount):
     Cette classe hérite de BankAccount et applique une récompense de 5 % 
     sur chaque dépôt effectué.
     """
-    
+
     def deposit(self, amount):
         """
         Dépose un montant dans le compte avec une récompense de 5 %.
@@ -134,3 +134,39 @@ class InterestRewardsAcct(BankAccount):
         if amount <= 0:
             raise ValueError("the deposit amount must be positive")
         self.balance += (amount*1.05)
+
+class SavingsAcct(InterestRewardsAcct):
+    """
+    Représente un compte d'épargne avec des récompenses sur dépôt 
+    et des frais fixes pour chaque retrait.
+    
+    Hérite de InterestRewardsAcct.
+    """
+    def __init__(self, initial_amount, acct_name, fee=5):
+        """
+        Initialise un compte d'épargne avec frais fixes de retrait.
+        
+        Args:
+            initial_amount (float): Solde initial du compte.
+            acct_name (str): Nom du compte.
+            fee (float):  Frais fixes pour chaque retrait (par defaut 5)
+        """
+        super().__init__(initial_amount, acct_name)
+        self.fee = fee
+
+    def withdraw(self, amount):
+        """
+        Retire un montant du compte en appliquant des frais fixes.
+        
+        Args:
+            amount (float): Le montant à retirer (sans les frais).
+
+        Raises:
+            BalanceException: Si le solde est insuffisant pour couvrir 
+                              le montant du retrait et les frais.
+        """
+        try:
+            self.viable_transaction(amount + self.fee)
+            self.balance -= (amount + self.fee)
+        except BalanceException as error:
+            print(f'withdraw interrupted : {error}')
